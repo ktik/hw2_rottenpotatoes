@@ -5,7 +5,7 @@ class MoviesController < ApplicationController
       @movies = Movie.find(:all, :order => "title DESC")
       flash[:notice] = 'title'
     elsif params[:sort].eql?("rdate") 
-      @movies = Movie.find(:all, :order => "release_date DESC")
+      @movies = Movie.find(:all, :order => "release_date ASC")
       flash[:notice] = 'release_date'
     else
       @movies = Movie.all
