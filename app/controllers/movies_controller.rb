@@ -1,10 +1,10 @@
 class MoviesController < ApplicationController
 
   def index
-    if params[:tsort].eql?("true")
+    if params[:sort].eql?("title")
       @movies = Movie.find(:all, :order => "title ASC")
       flash[:notice] = 'title'
-    elsif params[:rsort].eql?("true") 
+    elsif params[:sort].eql?("rdate") 
       @movies = Movie.find(:all, :order => "release_date ASC")
       flash[:notice] = 'release_date'
     else
