@@ -9,6 +9,7 @@ class MoviesController < ApplicationController
       @movies = Movie.find(:all,:order => "release_date")
     else
       @movies = Movie.all
+      flash[:notice] = nil
     end
   end
   
