@@ -1,14 +1,25 @@
 class MoviesController < ApplicationController
 
   def index
+    if @all_ratings.nil?
+      @all_ratings = Movie.select(:rating).map(&:rating).uniq
+    end
+    
     if params[:sort].eql?("title")
       flash[:notice] = 'title'
-      @movies = Movie.find(:all,:order => "title")
+      @movies = Movie.where(:rating => params[:filter]).find(:all,:order => "title")
+      @checks = params[:filter]
     elsif params[:sort].eql?("rdate") 
       flash[:notice] = 'release_date'
-      @movies = Movie.find(:all,:order => "release_date")
+      @movies = Movie.where(:rating => params[:filter]).find(:all,:order => "release_date")
+      @checks = params[:filter]
     else
-      @movies = Movie.all
+      if params[:ratings]
+        @movies = Movie.where(:rating => params[:ratings].keys)
+	@checks = params[:ratings].keys
+      else
+	@movies = Movie.all
+      end
       flash[:notice] = nil
     end
   end
