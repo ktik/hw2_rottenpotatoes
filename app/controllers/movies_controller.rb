@@ -4,23 +4,40 @@ class MoviesController < ApplicationController
     if @all_ratings.nil?
       @all_ratings = Movie.select(:rating).map(&:rating).uniq
     end
-    
-    if params[:sort].eql?("title")
+    if params[:ratings]==nil and params[:sort]==nil and params[:filter]==nil and session!=nil
+      @movies = Movie.where(:rating => session[:rating]).find(:all,:order => session[:sort])
+      @checks = session[:rating]
+      flash[:notice] = session[:sort]
+      flash.keep
+    end
+    if params[:sort].eql?("title") 
       flash[:notice] = 'title'
-      @movies = Movie.where(:rating => params[:filter]).find(:all,:order => "title")
-      @checks = params[:filter]
-    elsif params[:sort].eql?("rdate") 
+      session[:sort] = "title"
+      session[:rating] = params[:filter]
+      @movies = Movie.where(:rating => session[:rating]).find(:all,:order => "title")
+      @checks = session[:rating]
+      flash.keep
+    elsif params[:sort].eql?("release_date") 
       flash[:notice] = 'release_date'
-      @movies = Movie.where(:rating => params[:filter]).find(:all,:order => "release_date")
-      @checks = params[:filter]
-    else
-      if params[:ratings]
-        @movies = Movie.where(:rating => params[:ratings].keys)
-	@checks = params[:ratings].keys
+      session[:sort] = "release_date"
+      session[:rating] = params[:filter]
+      @movies = Movie.where(:rating => session[:rating]).find(:all,:order => "release_date")
+      @checks = session[:rating]
+      flash.keep
+    elsif params[:ratings]
+      session[:rating] = params[:ratings].keys
+      if session[:sort]!=nil
+        @movies = Movie.where(:rating => session[:rating]).find(:all,:order => session[:sort])
       else
-	@movies = Movie.all
+	@movies = Movie.where(:rating => session[:rating])
       end
-      flash[:notice] = nil
+	@checks = session[:rating]
+    else
+      if session[:rating]!=nil and session[:sort]!=nil
+        @movies = Movie.where(:rating => session[:rating]).find(:all,:order => session[:sort])
+      else
+        @movies = Movie.all
+      end
     end
   end
   
