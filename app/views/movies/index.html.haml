@@ -4,15 +4,15 @@
   Include:
   - @all_ratings.each do |rating|
     = rating
-    = check_box_tag "ratings[#{rating}]", 1, (@checks==nil)? true:@checks.find_index(rating) 
+    = check_box_tag "ratings[#{rating}]", 1, (@checks==nil)? true:@checks[rating]
   = submit_tag 'Refresh', :id => "ratings_submit"
 
 %table#movies
   %thead
     %tr
-      %th{:class => ("hilite" if flash[:notice].eql?('title'))}= link_to "Movie Title", movies_path(:sort => "title", :filter => @checks), :id => "title_header"
+      %th{:class => ("hilite" if flash[:notice].eql?('title'))}= link_to "Movie Title", movies_path(:sort => "title", :ratings => @checks), :id => "title_header"
       %th Rating
-      %th{:class => ("hilite" if flash[:notice].eql?('release_date'))}= link_to "Release Date", movies_path(:sort => "release_date", :filter => @checks),:id => "release_date_header"
+      %th{:class => ("hilite" if flash[:notice].eql?('release_date'))}= link_to "Release Date", movies_path(:sort => "release_date", :ratings => @checks),:id => "release_date_header"
       %th More Info
   %tbody
     - @movies.each do |movie|

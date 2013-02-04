@@ -1,46 +1,33 @@
 class MoviesController < ApplicationController
 
   def index
+    check_for_redirect
+
     if @all_ratings.nil?
       @all_ratings = Movie.select(:rating).map(&:rating).uniq
     end
-    if params[:ratings]==nil and params[:sort]==nil and params[:filter]==nil and session!=nil
-      @movies = Movie.where(:rating => session[:rating]).find(:all,:order => session[:sort])
-      @checks = session[:rating]
-      flash[:notice] = session[:sort]
-      flash.keep
-    end
-    if params[:sort].eql?("title") 
+
+    if params[:sort].eql?("title") #user is sorting by title
       flash[:notice] = 'title'
-      session[:sort] = "title"
-      session[:rating] = params[:filter]
-      @movies = Movie.where(:rating => session[:rating]).find(:all,:order => "title")
+      (session[:rating]==nil)? @movies = Movie.find(:all,:order => "title") : @movies = Movie.where(:rating => session[:rating].keys).find(:all,:order => "title")
       @checks = session[:rating]
       flash.keep
-    elsif params[:sort].eql?("release_date") 
+    elsif params[:sort].eql?("release_date") #user is sorting by release date
       flash[:notice] = 'release_date'
-      session[:sort] = "release_date"
-      session[:rating] = params[:filter]
-      @movies = Movie.where(:rating => session[:rating]).find(:all,:order => "release_date")
+      (session[:rating]==nil)? @movies = Movie.find(:all,:order => "release_date") : @movies = Movie.where(:rating => session[:rating].keys).find(:all,:order => "release_date")
       @checks = session[:rating]
       flash.keep
-    elsif params[:ratings]
-      session[:rating] = params[:ratings].keys
+    elsif params[:ratings]		#user is refreshing the ratings
+      session[:rating] = params[:ratings]
       if session[:sort]!=nil
-        @movies = Movie.where(:rating => session[:rating]).find(:all,:order => session[:sort])
-      else
-	@movies = Movie.where(:rating => session[:rating])
-      end
+        @movies = Movie.where(:rating => session[:rating].keys).find(:all,:order => session[:sort])
 	@checks = session[:rating]
-    else
-      if session[:rating]!=nil and session[:sort]!=nil
-        @movies = Movie.where(:rating => session[:rating]).find(:all,:order => session[:sort])
-	rediret_to movies_path(session)
-      elsif session[:rating]!=nil and session[:sort]==nil
-        @movies = Movie.where(:rating => session[:rating])
       else
-        @movies = Movie.all
+	@movies = Movie.where(:rating => session[:rating].keys)
+	@checks = session[:rating]
       end
+    else
+      @movies = Movie.all
     end
   end
   
@@ -75,6 +62,17 @@ class MoviesController < ApplicationController
     @movie.destroy
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
+  end
+  
+  private
+  def check_for_redirect
+    if params[:sort] != session[:sort] and params[:ratings] != session[:rating]
+      redirect_needed = true
+    end
+    session[:sort] = params[:sort] unless params[:sort].nil?
+    session[:rating] = params[:ratings] unless params[:ratings].nil?
+    redirect_to movies_path(:sort => session[:sort],:ratings => session[:rating]) if redirect_needed
+    
   end
 
 
