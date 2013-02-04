@@ -22,9 +22,11 @@ class MoviesController < ApplicationController
       if session[:sort]!=nil
         @movies = Movie.where(:rating => session[:rating].keys).find(:all,:order => session[:sort])
 	@checks = session[:rating]
+	
       else
 	@movies = Movie.where(:rating => session[:rating].keys)
 	@checks = session[:rating]
+	
       end
     else
       @movies = Movie.all
@@ -66,7 +68,7 @@ class MoviesController < ApplicationController
   
   private
   def check_for_redirect
-    if params[:sort] != session[:sort] and params[:ratings] != session[:rating]
+    if params[:sort] != session[:sort] or params[:ratings] != session[:rating]
       redirect_needed = true
     end
     session[:sort] = params[:sort] unless params[:sort].nil?
