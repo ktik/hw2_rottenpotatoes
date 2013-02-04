@@ -35,6 +35,9 @@ class MoviesController < ApplicationController
     else
       if session[:rating]!=nil and session[:sort]!=nil
         @movies = Movie.where(:rating => session[:rating]).find(:all,:order => session[:sort])
+	rediret_to movies_path(session)
+      elsif session[:rating]!=nil and session[:sort]==nil
+        @movies = Movie.where(:rating => session[:rating])
       else
         @movies = Movie.all
       end
